@@ -1,0 +1,13 @@
+services:
+    postgresql:
+        image: postgres:14-alpine
+        restart: always
+        volumes:
+            - ./DATA/postgresql_data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_HOST=${PRIMARY_POSTGRES_SERVER_URL}
+            - POSTGRES_DB=${PRIMARY_POSTGRES_DB_NAME}
+            - POSTGRES_USER=${PRIMARY_POSTGRES_USERNAME}
+            - POSTGRES_PASSWORD=${PRIMARY_POSTGRES_PASSWORD}
+        ports:
+            - ${PRIMARY_POSTGRES_SERVER_PORT}:5432

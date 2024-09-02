@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "setup": "cp .sample.env .env && npm install && npm run docker:up",
+    "docker:up": "docker compose up -d",
+    "db:migrate": "prisma migrate dev --schema prisma/schema.prisma"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^5.19.0",
     "prisma": "^5.19.0"
   }
 }

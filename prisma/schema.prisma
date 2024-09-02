@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @db.VarChar(32)
+  password  String
+  createdAt DateTime @default(now()) // Timestamp of when the user was created
+  updatedAt DateTime // Timestamp of when the user was last updated
+  Image     Image[]
+  Like      Like[]
+
+  @@map("user")
+}
+
+model Image {
+  id          String    @id @default(cuid())
+  uri         String
+  isPublished Boolean
+  category    Category  @relation(fields: [categoryId], references: [id])
+  tag         Tag       @relation(fields: [tagId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+  deletedAt   DateTime?
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  tagId       String
+  categoryId  String
+  Like        Like[]
+
+  @@map("image")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  info      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+  Image     Image[]
+
+  @@map("tag")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  category  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+  Image     Image[]
+
+  @@map("category")
+}
+
+model Like {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  image     Image     @relation(fields: [imageId], references: [id])
+  imageId   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+
+  @@map("like")
+}

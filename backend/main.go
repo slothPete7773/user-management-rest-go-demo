@@ -50,14 +50,19 @@ func NewServer() *Server {
 			ReadTimeout:  5 * time.Second,
 			IdleTimeout:  5 * time.Second,
 		},
-		router: http.NewServeMux(),
+		router: &http.ServeMux{},
 	}
 
 	server.routes()
 
-	c := cors.New(cors.Options{})
-
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Allow all origins
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true, // Adjust this based on your use case
+	})
 	server.server.Handler = c.Handler(server.router)
+	// server.server.Handler = server.router // Router without CORS
 	return &server
 
 }

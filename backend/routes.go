@@ -2,7 +2,6 @@ package main
 
 import (
 	"backend/middlewares"
-	"backend/service"
 	"net/http"
 
 	"github.com/rs/cors"
@@ -17,6 +16,7 @@ func (s *Server) routes() {
 		AllowCredentials: true, // Adjust this based on your use case
 	}).Handler)
 	s.router.Use(middlewares.Logger)
+
 	apiRouter := s.router.PathPrefix("/api/v1").Subrouter()
 
 	noAuthRouter := apiRouter.PathPrefix("").Subrouter()
@@ -24,14 +24,14 @@ func (s *Server) routes() {
 		noAuthRouter.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Health OK?\n"))
 		})
-		noAuthRouter.Handle("/public", service.MockPublicEndpoint()).Methods("POST", "PUT", "GET")
+		noAuthRouter.Handle("/public", s.userHandler.MockUserPublicEndpoint()).Methods("POST", "PUT", "GET")
 	}
 
 	mustAuthRouter := apiRouter.PathPrefix("").Subrouter()
 	mustAuthRouter.Use(middlewares.Authenticate)
 	{
-		mustAuthRouter.Handle("/private", service.MockPrivateEndpoint()).Methods("POST", "PUT", "GET")
-		mustAuthRouter.Handle("/user", s.userHandler.Greet())
+		mustAuthRouter.Handle("/private", s.userHandler.MockUserPrivateEndpoint()).Methods("POST", "PUT", "GET")
+		mustAuthRouter.Handle("/user", s.userHandler.MockUserPrivateEndpoint())
 	}
 
 }

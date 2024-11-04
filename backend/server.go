@@ -1,9 +1,9 @@
 package main
 
 import (
-	userHandler "backend/modules/user/handler"
-	userRepository "backend/modules/user/repository"
-	userService "backend/modules/user/service"
+	"backend/handler"
+	"backend/repository/postres"
+	"backend/service"
 	"log"
 	"net/http"
 	"strings"
@@ -15,7 +15,7 @@ import (
 type Server struct {
 	server      *http.Server
 	router      *mux.Router
-	userHandler userHandler.UserHandler
+	userHandler handler.UserHandler
 }
 
 func NewServer() *Server {
@@ -28,9 +28,9 @@ func NewServer() *Server {
 		router: mux.NewRouter().StrictSlash(true),
 	}
 
-	userRepo := userRepository.NewUserRepository(nil)
-	userService := userService.NewUserService(userRepo)
-	userHandler := userHandler.NewUserHandler(userService)
+	userRepo := postres.NewUserRepository(nil)
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
 
 	server.userHandler = userHandler
 	server.routes()

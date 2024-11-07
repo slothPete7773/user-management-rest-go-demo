@@ -1,4 +1,4 @@
-# Online Learning Platform DEMO
+# User management backend demo
 
 This project is a demo project for demonstrating and practicing developing a backend application using Golang.
 

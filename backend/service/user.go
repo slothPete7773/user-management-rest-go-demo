@@ -12,7 +12,18 @@ func NewUserService(repository conduit.UserRepository) conduit.UserService {
 	}
 }
 
-func (s userService) NewUser() error {
-	s.repository.Create()
+func (s userService) NewUser(input conduit.UserInput) (conduit.User, error) {
+	return conduit.User{}, nil
+}
+func (s userService) UpdateUser(id string, input conduit.UserInput) (conduit.User, error) {
+	return conduit.User{}, nil
+}
+func (s userService) DeleteUserById(id string) error {
 	return nil
+}
+func (s userService) FindUserById(id string) (conduit.User, error) {
+	return conduit.User{}, nil
+}
+func (s userService) FindMany() ([]conduit.User, error) {
+	return nil, nil
 }

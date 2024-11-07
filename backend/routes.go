@@ -2,7 +2,6 @@ package main
 
 import (
 	"backend/middlewares"
-	"net/http"
 
 	"github.com/rs/cors"
 )
@@ -21,9 +20,7 @@ func (s *Server) routes() {
 
 	noAuthRouter := apiRouter.PathPrefix("").Subrouter()
 	{
-		noAuthRouter.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("Health OK?\n"))
-		})
+		noAuthRouter.Handle("/health", s.userHandler.MockUserHealthcheckEndpoint()).Methods("GET")
 		noAuthRouter.Handle("/public", s.userHandler.MockUserPublicEndpoint()).Methods("POST", "PUT", "GET")
 	}
 

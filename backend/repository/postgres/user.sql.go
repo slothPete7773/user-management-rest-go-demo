@@ -12,23 +12,54 @@ import (
 )
 
 const deleteAccount = `-- name: DeleteAccount :exec
-DELETE FROM account
-WHERE username = $1
+UPDATE account
+SET deleted_at = NOW()
+WHERE id = $1
 `
 
-func (q *Queries) DeleteAccount(ctx context.Context, username string) error {
-	_, err := q.db.Exec(ctx, deleteAccount, username)
+func (q *Queries) DeleteAccount(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteAccount, id)
+	return err
+}
+
+const deleteAccountInfo = `-- name: DeleteAccountInfo :exec
+UPDATE account_information
+SET deleted_at = NOW()
+WHERE account_id = $1
+`
+
+func (q *Queries) DeleteAccountInfo(ctx context.Context, accountID pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteAccountInfo, accountID)
 	return err
 }
 
 const getAccount = `-- name: GetAccount :one
-SELECT id, username, email, created_at, updated_at, deleted_at FROM account
+SELECT a.id, username, email, a.created_at, a.updated_at, a.deleted_at, ai.id, display_name, favorite_number, homeworld_realm, ai.created_at, ai.updated_at, ai.deleted_at, account_id FROM account AS a
+JOIN account_information AS ai
+  ON a.id = ai.account_id
 WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) GetAccount(ctx context.Context, username string) (Account, error) {
+type GetAccountRow struct {
+	ID             pgtype.UUID
+	Username       string
+	Email          string
+	CreatedAt      pgtype.Timestamp
+	UpdatedAt      pgtype.Timestamp
+	DeletedAt      pgtype.Timestamp
+	ID_2           pgtype.UUID
+	DisplayName    string
+	FavoriteNumber pgtype.Int4
+	HomeworldRealm pgtype.Text
+	CreatedAt_2    pgtype.Timestamp
+	UpdatedAt_2    pgtype.Timestamp
+	DeletedAt_2    pgtype.Timestamp
+	AccountID      pgtype.UUID
+}
+
+func (q *Queries) GetAccount(ctx context.Context, username string) (GetAccountRow, error) {
 	row := q.db.QueryRow(ctx, getAccount, username)
-	var i Account
+	var i GetAccountRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -36,26 +67,82 @@ func (q *Queries) GetAccount(ctx context.Context, username string) (Account, err
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.ID_2,
+		&i.DisplayName,
+		&i.FavoriteNumber,
+		&i.HomeworldRealm,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
+		&i.DeletedAt_2,
+		&i.AccountID,
+	)
+	return i, err
+}
+
+const getAccountInfoByEmail = `-- name: GetAccountInfoByEmail :one
+SELECT a.id, username, email, a.created_at, a.updated_at, a.deleted_at, ai.id, display_name, favorite_number, homeworld_realm, ai.created_at, ai.updated_at, ai.deleted_at, account_id FROM account AS a
+JOIN account_information AS ai
+  ON a.id = ai.account_id
+WHERE email = $1 LIMIT 1
+`
+
+type GetAccountInfoByEmailRow struct {
+	ID             pgtype.UUID
+	Username       string
+	Email          string
+	CreatedAt      pgtype.Timestamp
+	UpdatedAt      pgtype.Timestamp
+	DeletedAt      pgtype.Timestamp
+	ID_2           pgtype.UUID
+	DisplayName    string
+	FavoriteNumber pgtype.Int4
+	HomeworldRealm pgtype.Text
+	CreatedAt_2    pgtype.Timestamp
+	UpdatedAt_2    pgtype.Timestamp
+	DeletedAt_2    pgtype.Timestamp
+	AccountID      pgtype.UUID
+}
+
+func (q *Queries) GetAccountInfoByEmail(ctx context.Context, email string) (GetAccountInfoByEmailRow, error) {
+	row := q.db.QueryRow(ctx, getAccountInfoByEmail, email)
+	var i GetAccountInfoByEmailRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.ID_2,
+		&i.DisplayName,
+		&i.FavoriteNumber,
+		&i.HomeworldRealm,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
+		&i.DeletedAt_2,
+		&i.AccountID,
 	)
 	return i, err
 }
 
 const insertAccount = `-- name: InsertAccount :one
 INSERT INTO account (
-  username, email
-) VALUES (
-  $1, $2
+  id, username, email, created_at, updated_at
+)
+VALUES (
+  $1, $2, $3, NOW(), NOW()
 )
 RETURNING id, username, email, created_at, updated_at, deleted_at
 `
 
 type InsertAccountParams struct {
+	ID       pgtype.UUID
 	Username string
 	Email    string
 }
 
 func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) (Account, error) {
-	row := q.db.QueryRow(ctx, insertAccount, arg.Username, arg.Email)
+	row := q.db.QueryRow(ctx, insertAccount, arg.ID, arg.Username, arg.Email)
 	var i Account
 	err := row.Scan(
 		&i.ID,
@@ -70,9 +157,15 @@ func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) (A
 
 const insertAccountInfo = `-- name: InsertAccountInfo :one
 INSERT INTO account_information (
-  id, display_name, favorite_number, homeworld_realm, account_id
+  id
+  , display_name
+  , favorite_number
+  , homeworld_realm
+  , account_id
+  , created_at
+  , updated_at
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, NOW(), NOW()
 )
 RETURNING id, display_name, favorite_number, homeworld_realm, created_at, updated_at, deleted_at, account_id
 `
@@ -108,19 +201,38 @@ func (q *Queries) InsertAccountInfo(ctx context.Context, arg InsertAccountInfoPa
 }
 
 const listAccounts = `-- name: ListAccounts :many
-SELECT id, username, email, created_at, updated_at, deleted_at FROM account
+SELECT a.id, username, email, a.created_at, a.updated_at, a.deleted_at, ai.id, display_name, favorite_number, homeworld_realm, ai.created_at, ai.updated_at, ai.deleted_at, account_id FROM account AS a
+JOIN account_information AS ai
+  ON a.id = ai.account_id
 ORDER BY username
 `
 
-func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
+type ListAccountsRow struct {
+	ID             pgtype.UUID
+	Username       string
+	Email          string
+	CreatedAt      pgtype.Timestamp
+	UpdatedAt      pgtype.Timestamp
+	DeletedAt      pgtype.Timestamp
+	ID_2           pgtype.UUID
+	DisplayName    string
+	FavoriteNumber pgtype.Int4
+	HomeworldRealm pgtype.Text
+	CreatedAt_2    pgtype.Timestamp
+	UpdatedAt_2    pgtype.Timestamp
+	DeletedAt_2    pgtype.Timestamp
+	AccountID      pgtype.UUID
+}
+
+func (q *Queries) ListAccounts(ctx context.Context) ([]ListAccountsRow, error) {
 	rows, err := q.db.Query(ctx, listAccounts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Account
+	var items []ListAccountsRow
 	for rows.Next() {
-		var i Account
+		var i ListAccountsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,
@@ -128,6 +240,14 @@ func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.ID_2,
+			&i.DisplayName,
+			&i.FavoriteNumber,
+			&i.HomeworldRealm,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.DeletedAt_2,
+			&i.AccountID,
 		); err != nil {
 			return nil, err
 		}
@@ -141,18 +261,21 @@ func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
 
 const updateAccount = `-- name: UpdateAccount :one
 UPDATE account
-  set email = $2
-WHERE username = $1
+  set
+    username = $2,
+    email = $3
+WHERE id = $1
 RETURNING id, username, email, created_at, updated_at, deleted_at
 `
 
 type UpdateAccountParams struct {
+	ID       pgtype.UUID
 	Username string
 	Email    string
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {
-	row := q.db.QueryRow(ctx, updateAccount, arg.Username, arg.Email)
+	row := q.db.QueryRow(ctx, updateAccount, arg.ID, arg.Username, arg.Email)
 	var i Account
 	err := row.Scan(
 		&i.ID,
@@ -161,6 +284,45 @@ func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (A
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateAccountInfo = `-- name: UpdateAccountInfo :one
+UPDATE account_information
+SET
+  display_name = $1
+  , favorite_number = $2
+  , homeworld_realm = $3
+  , updated_at = NOW()
+WHERE account_id = $4
+RETURNING id, display_name, favorite_number, homeworld_realm, created_at, updated_at, deleted_at, account_id
+`
+
+type UpdateAccountInfoParams struct {
+	DisplayName    string
+	FavoriteNumber pgtype.Int4
+	HomeworldRealm pgtype.Text
+	AccountID      pgtype.UUID
+}
+
+func (q *Queries) UpdateAccountInfo(ctx context.Context, arg UpdateAccountInfoParams) (AccountInformation, error) {
+	row := q.db.QueryRow(ctx, updateAccountInfo,
+		arg.DisplayName,
+		arg.FavoriteNumber,
+		arg.HomeworldRealm,
+		arg.AccountID,
+	)
+	var i AccountInformation
+	err := row.Scan(
+		&i.ID,
+		&i.DisplayName,
+		&i.FavoriteNumber,
+		&i.HomeworldRealm,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AccountID,
 	)
 	return i, err
 }

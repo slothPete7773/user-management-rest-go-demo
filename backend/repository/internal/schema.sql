@@ -33,7 +33,10 @@ CREATE TABLE
   account_role (
     id UUID PRIMARY KEY,
     account_id UUID NOT NULL REFERENCES account (id),
-    user_role_id UUID NOT NULL REFERENCES user_role (id)
+    user_role_id UUID NOT NULL REFERENCES user_role (id),
+    created_at TIMESTAMP NOT NULL DEFAULT now (),
+    updated_at TIMESTAMP NOT NULL DEFAULT now (),
+    deleted_at TIMESTAMP
   );
 
 CREATE TABLE
@@ -50,13 +53,7 @@ CREATE TABLE
   project_account_assignment (
     id UUID PRIMARY KEY,
     project_id UUID NOT NULL REFERENCES project (id),
-    account_id UUID NOT NULL REFERENCES account (id)
-  );
-
-CREATE TABLE
-  invitation_status (
-    id UUID PRIMARY KEY,
-    status TEXT NOT NULL,
+    account_id UUID NOT NULL REFERENCES account (id),
     created_at TIMESTAMP NOT NULL DEFAULT now (),
     updated_at TIMESTAMP NOT NULL DEFAULT now (),
     deleted_at TIMESTAMP

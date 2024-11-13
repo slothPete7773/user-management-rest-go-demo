@@ -32,14 +32,9 @@ type AccountRole struct {
 	ID         pgtype.UUID
 	AccountID  pgtype.UUID
 	UserRoleID pgtype.UUID
-}
-
-type InvitationStatus struct {
-	ID        pgtype.UUID
-	Status    string
-	CreatedAt pgtype.Timestamp
-	UpdatedAt pgtype.Timestamp
-	DeletedAt pgtype.Timestamp
+	CreatedAt  pgtype.Timestamp
+	UpdatedAt  pgtype.Timestamp
+	DeletedAt  pgtype.Timestamp
 }
 
 type Project struct {
@@ -55,6 +50,9 @@ type ProjectAccountAssignment struct {
 	ID        pgtype.UUID
 	ProjectID pgtype.UUID
 	AccountID pgtype.UUID
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
+	DeletedAt pgtype.Timestamp
 }
 
 type UserRole struct {

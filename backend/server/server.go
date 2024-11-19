@@ -1,9 +1,9 @@
-package main
+package server
 
 import (
-	"backend/handler"
-	"backend/repository/postres"
-	"backend/service"
+	"backend/adapter/handler"
+	"backend/adapter/repository"
+	"backend/core/services"
 	"log"
 	"net/http"
 	"strings"
@@ -15,7 +15,7 @@ import (
 type Server struct {
 	server      *http.Server
 	router      *mux.Router
-	userHandler handler.UserHandler
+	userHandler *handler.UserHandler
 }
 
 func NewServer() *Server {
@@ -28,8 +28,9 @@ func NewServer() *Server {
 		router: mux.NewRouter().StrictSlash(true),
 	}
 
-	userRepo := postres.NewUserRepository(nil)
-	userService := service.NewUserService(userRepo)
+	repository := repository.NewRepository(nil)
+
+	userService := services.NewUserService(repository)
 	userHandler := handler.NewUserHandler(userService)
 
 	server.userHandler = userHandler
@@ -39,7 +40,7 @@ func NewServer() *Server {
 
 }
 
-func (s *Server) run(port string) error {
+func (s *Server) Run(port string) error {
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port
 	}

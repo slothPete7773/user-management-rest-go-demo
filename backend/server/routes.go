@@ -1,7 +1,7 @@
-package main
+package server
 
 import (
-	"backend/middlewares"
+	"backend/adapter/middlewares"
 
 	"github.com/rs/cors"
 )
@@ -20,15 +20,16 @@ func (s *Server) routes() {
 
 	noAuthRouter := apiRouter.PathPrefix("").Subrouter()
 	{
-		noAuthRouter.Handle("/health", s.userHandler.MockUserHealthcheckEndpoint()).Methods("GET")
-		noAuthRouter.Handle("/public", s.userHandler.MockUserPublicEndpoint()).Methods("POST", "PUT", "GET")
+		noAuthRouter.Handle("/user/id", s.userHandler.FindUserById()).Methods("GET")
+		noAuthRouter.Handle("/users", s.userHandler.FindMany()).Methods("GET")
 	}
 
 	mustAuthRouter := apiRouter.PathPrefix("").Subrouter()
 	mustAuthRouter.Use(middlewares.Authenticate)
 	{
-		mustAuthRouter.Handle("/private", s.userHandler.MockUserPrivateEndpoint()).Methods("POST", "PUT", "GET")
-		mustAuthRouter.Handle("/user", s.userHandler.MockUserPrivateEndpoint())
+		mustAuthRouter.Handle("/new-user", s.userHandler.NewUser()).Methods("POST")
+		mustAuthRouter.Handle("/update-user", s.userHandler.UpdateUser()).Methods("PUT")
+		mustAuthRouter.Handle("/delete-user", s.userHandler.DeleteUserById()).Methods("PUT")
 	}
 
 }

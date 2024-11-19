@@ -1,9 +1,12 @@
 package main
 
-import "log"
+import (
+	"backend/server"
+	"log"
+)
 
 func main() {
-	server := NewServer()
-	log.Fatal(server.run(":8000"))
+	srv := server.NewServer()
+	log.Fatal(srv.Run(":8000"))
 
 }

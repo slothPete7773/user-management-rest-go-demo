@@ -1,9 +1,42 @@
 package repository
 
-import "backend/core/domain"
+import (
+	"backend/core/domain"
+	"fmt"
 
-func (r Repository) Create(domain.UserData) (domain.User, error) {
-	return domain.User{}, nil
+	"github.com/google/uuid"
+)
+
+func (r Repository) Create(data domain.UserData) (*domain.User, error) {
+	query := `
+	insert into users ( id, name, favorite_number, homeworld_realm)
+	values (?, ?, ?, ?)
+	`
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		fmt.Println("error-user-create-tx", err.Error())
+		return nil, err
+	}
+
+	id := uuid.New().String()
+	_, err = tx.Exec(query, id, data.Name, data.FavoriteNumber, data.HomeworldRealm)
+	if err != nil {
+		fmt.Println("error-user-create", err.Error())
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		fmt.Println("error-user-create-commit", err.Error())
+		return nil, err
+	}
+	return &domain.User{
+		ID:             id,
+		Name:           data.Name,
+		FavoriteNumber: data.FavoriteNumber,
+		HomeworldRealm: data.HomeworldRealm,
+	}, nil
 }
 func (r Repository) Update(string, domain.UserData) (domain.User, error) {
 	return domain.User{}, nil

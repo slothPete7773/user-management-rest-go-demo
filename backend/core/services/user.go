@@ -3,6 +3,7 @@ package services
 import (
 	"backend/core/domain"
 	"backend/core/ports"
+	"fmt"
 )
 
 type UserService struct {
@@ -13,8 +14,17 @@ func NewUserService(repo ports.UserRepository) ports.UserService {
 	return UserService{repo}
 }
 
-func (UserService) NewUser(domain.UserInput) (domain.User, error) {
-	return domain.User{}, nil
+func (service UserService) NewUser(input domain.UserInput) (*domain.User, error) {
+	user, err := service.repo.Create(domain.UserData{
+		Name:           input.Name,
+		FavoriteNumber: input.FavoriteNumber,
+		HomeworldRealm: input.HomeworldRealm,
+	})
+
+	if err != nil {
+		fmt.Println("service-new-user-error", err.Error())
+	}
+	return user, nil
 }
 func (UserService) UpdateUser(string, domain.UserInput) (domain.User, error) {
 	return domain.User{}, nil

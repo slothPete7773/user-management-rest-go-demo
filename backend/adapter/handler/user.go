@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"backend/core/domain"
 	"backend/core/ports"
 	"net/http"
 )
@@ -13,9 +14,14 @@ func NewUserHandler(service ports.UserService) *UserHandler {
 	return &UserHandler{service}
 }
 
-func (UserHandler) NewUser() http.Handler {
+func (hlr UserHandler) NewUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("NewUser\n"))
+		hlr.service.NewUser(domain.UserInput{
+			Name:           "pete",
+			FavoriteNumber: 773,
+			HomeworldRealm: "Lopburi",
+		})
 	})
 }
 func (UserHandler) UpdateUser() http.Handler {

@@ -8,9 +8,9 @@ type User struct {
 }
 
 type UserInput struct {
-	Name           string
-	FavoriteNumber int
-	HomeworldRealm string
+	Name           string `json:"name"`
+	FavoriteNumber int    `json:"favorite_number"`
+	HomeworldRealm string `json:"homeworld_realm"`
 }
 
 type UserData struct {

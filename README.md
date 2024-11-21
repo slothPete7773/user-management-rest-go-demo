@@ -18,10 +18,6 @@ Think of it as a simple clone of good-old Instagram.
 - [ ] Image must be put into at least 1 category. Maximum to 3 categories.
 - [ ] User can give a `Like` expression to an image. 1 user per 1 image.
 
-## Example UI for ideas
+## Reference while developing this tutorial.
 
-![alt text](images/example-ui.png)
-Example UI from [HubSpot's Idea for backend](https://blog.hubspot.com/website/backend-projects#:~:text=Deploy%20an%20Image%20Management%20Application).
-
-![alt text](images/example-dashboard.png)
-Example Dashboard from [ Mohammad Amin Masoudi | Dribbble](https://dribbble.com/shots/18741931-Instagram-Insight-Website).
+- [Go: Properly Binding Request Body ](https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body)

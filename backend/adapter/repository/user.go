@@ -2,6 +2,8 @@ package repository
 
 import (
 	"backend/core/domain"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -97,8 +99,29 @@ func (r Repository) DeleteById(id string) error {
 	}
 	return nil
 }
-func (r Repository) GetById(string) (*domain.User, error) {
-	return &domain.User{}, nil
+func (r Repository) GetById(id string) (*domain.User, error) {
+	query := `
+	select * from users
+	where id = ?
+	`
+
+	row := r.db.QueryRow(query, id)
+	if err := row.Err(); err != nil {
+		fmt.Println("error-user-query-user-by-id", err)
+		return nil, err
+	}
+
+	// var user domain.User
+	user := new(domain.User)
+	err := row.Scan(&user.ID, &user.Name, &user.FavoriteNumber, &user.HomeworldRealm)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, sql.ErrNoRows
+	} else if err != nil {
+		fmt.Println("error-user-query-user-by-id", err)
+		return nil, err
+	}
+
+	return user, nil
 }
 func (r Repository) GetMany() ([]*domain.User, error) {
 	query := `

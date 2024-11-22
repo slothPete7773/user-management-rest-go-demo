@@ -57,13 +57,28 @@ func (hl UserHandler) UpdateUser() http.Handler {
 		fmt.Println("User: ", user)
 	})
 }
-func (UserHandler) DeleteUserById() http.Handler {
+func (hl UserHandler) DeleteUserById() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := "3d50dcad-f576-43e0-a23c-c0debe65819d"
+		err := hl.service.DeleteUserById(id)
+		if err != nil {
+			fmt.Println("error-handler-delete-user")
+			http.Error(w, "error deleting user", http.StatusInternalServerError)
+		}
+
 		w.Write([]byte("DeleteUserById\n"))
 	})
 }
-func (UserHandler) FindUserById() http.Handler {
+func (hl UserHandler) FindUserById() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := "5b9f1668-c8b6-48e3-843a-1490e7f3e926"
+		user, err := hl.service.FindUserById(id)
+		if err != nil {
+			fmt.Println("error-handler-get-by-id")
+			http.Error(w, "error getting a user by Id", http.StatusInternalServerError)
+		}
+
+		fmt.Println(*user)
 		w.Write([]byte("FindUserById\n"))
 	})
 }

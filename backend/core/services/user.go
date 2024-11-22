@@ -40,11 +40,22 @@ func (svc UserService) UpdateUser(id string, input domain.UserInput) (*domain.Us
 	}
 	return user, nil
 }
-func (UserService) DeleteUserById(string) error {
+func (svc UserService) DeleteUserById(id string) error {
+	err := svc.DeleteUserById(id)
+	if err != nil {
+		fmt.Println("service-delete-user-error", err.Error())
+		return err
+	}
 	return nil
 }
-func (UserService) FindUserById(string) (*domain.User, error) {
-	return &domain.User{}, nil
+func (svc UserService) FindUserById(id string) (*domain.User, error) {
+
+	user, err := svc.repo.GetById(id)
+	if err != nil {
+		fmt.Println("service-get-user-by-id-error", err.Error())
+		return nil, err
+	}
+	return user, nil
 }
 func (svc UserService) FindMany() ([]*domain.User, error) {
 	users, err := svc.repo.GetMany()

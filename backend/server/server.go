@@ -3,13 +3,19 @@ package server
 import (
 	"backend/adapter/handler"
 	"backend/adapter/repository"
+	"backend/core/domain"
 	"backend/core/services"
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
+	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -28,7 +34,20 @@ func NewServer() *Server {
 		router: mux.NewRouter().StrictSlash(true),
 	}
 
-	repository := repository.NewRepository(nil)
+	if gormDb, err := gorm.Open(sqlite.Open("database.db")); err == nil {
+		gormDb.AutoMigrate(domain.User{})
+	}
+
+	db, err := sql.Open("sqlite3", "file:database.db?cache=shared")
+	if err != nil {
+		panic(err)
+	}
+	if err = db.Ping(); err != nil {
+		panic(err)
+	}
+	fmt.Println("Ping completed.")
+
+	repository := repository.NewRepository(db)
 
 	userService := services.NewUserService(repository)
 	userHandler := handler.NewUserHandler(userService)

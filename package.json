@@ -6,7 +6,7 @@
     "setup": "cp .sample.env .env && npm install && npm run docker:up",
     "docker:up": "docker compose up -d",
     "db:migrate": "prisma migrate dev --schema prisma/schema.prisma",
-    "dev:reload": "cd backend && nodemon -e go --exec go run . --signal SIGTERM",
+    "dev:reload": "cd backend && nodemon -e go --exec go run main.go --signal SIGTERM",
     "sqlc:generate": "sqlc generate"
   },
   "keywords": [],

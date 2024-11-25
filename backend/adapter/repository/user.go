@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r Repository) Create(data domain.UserData) (*domain.User, error) {
+func (r Repository) CreateUser(data domain.UserData) (*domain.User, error) {
 	query := `
 	insert into users ( id, name, favorite_number, homeworld_realm)
 	values (?, ?, ?, ?)
@@ -40,7 +40,7 @@ func (r Repository) Create(data domain.UserData) (*domain.User, error) {
 		HomeworldRealm: data.HomeworldRealm,
 	}, nil
 }
-func (r Repository) Update(id string, data domain.UserData) (*domain.User, error) {
+func (r Repository) UpdateUser(id string, data domain.UserData) (*domain.User, error) {
 	query := `
 	update users
 	set
@@ -75,7 +75,7 @@ func (r Repository) Update(id string, data domain.UserData) (*domain.User, error
 	}, nil
 	// return domain.User{}, nil
 }
-func (r Repository) DeleteById(id string) error {
+func (r Repository) DeleteUserById(id string) error {
 	query := `
 	DELETE FROM customers WHERE customer_id = ?
 	`
@@ -99,7 +99,7 @@ func (r Repository) DeleteById(id string) error {
 	}
 	return nil
 }
-func (r Repository) GetById(id string) (*domain.User, error) {
+func (r Repository) GetUserById(id string) (*domain.User, error) {
 	query := `
 	select * from users
 	where id = ?
@@ -123,7 +123,7 @@ func (r Repository) GetById(id string) (*domain.User, error) {
 
 	return user, nil
 }
-func (r Repository) GetMany() ([]*domain.User, error) {
+func (r Repository) GetUserMany() ([]*domain.User, error) {
 	query := `
 	select * from users
 	`

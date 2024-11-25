@@ -3,11 +3,11 @@ package ports
 import "backend/core/domain"
 
 type UserRepository interface {
-	Create(domain.UserData) (*domain.User, error)
-	Update(string, domain.UserData) (*domain.User, error)
-	DeleteById(string) error
-	GetById(string) (*domain.User, error)
-	GetMany() ([]*domain.User, error)
+	CreateUser(domain.UserData) (*domain.User, error)
+	UpdateUser(string, domain.UserData) (*domain.User, error)
+	DeleteUserById(string) error
+	GetUserById(string) (*domain.User, error)
+	GetUserMany() ([]*domain.User, error)
 }
 
 type UserService interface {

@@ -15,7 +15,7 @@ func NewUserService(repo ports.UserRepository) ports.UserService {
 }
 
 func (svc UserService) NewUser(input domain.UserInput) (*domain.User, error) {
-	user, err := svc.repo.Create(domain.UserData{
+	user, err := svc.repo.CreateUser(domain.UserData{
 		Name:           input.Name,
 		FavoriteNumber: input.FavoriteNumber,
 		HomeworldRealm: input.HomeworldRealm,
@@ -28,7 +28,7 @@ func (svc UserService) NewUser(input domain.UserInput) (*domain.User, error) {
 	return user, nil
 }
 func (svc UserService) UpdateUser(id string, input domain.UserInput) (*domain.User, error) {
-	user, err := svc.repo.Update(id, domain.UserData{
+	user, err := svc.repo.UpdateUser(id, domain.UserData{
 		Name:           "slothPete",
 		FavoriteNumber: 42,
 		HomeworldRealm: "bakk",
@@ -50,7 +50,7 @@ func (svc UserService) DeleteUserById(id string) error {
 }
 func (svc UserService) FindUserById(id string) (*domain.User, error) {
 
-	user, err := svc.repo.GetById(id)
+	user, err := svc.repo.GetUserById(id)
 	if err != nil {
 		fmt.Println("service-get-user-by-id-error", err.Error())
 		return nil, err
@@ -58,7 +58,7 @@ func (svc UserService) FindUserById(id string) (*domain.User, error) {
 	return user, nil
 }
 func (svc UserService) FindMany() ([]*domain.User, error) {
-	users, err := svc.repo.GetMany()
+	users, err := svc.repo.GetUserMany()
 	if err != nil {
 		fmt.Println("service-update-user-error", err.Error())
 		return nil, err

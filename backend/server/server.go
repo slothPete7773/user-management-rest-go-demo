@@ -22,6 +22,7 @@ type Server struct {
 	server      *http.Server
 	router      *mux.Router
 	userHandler *handler.UserHandler
+	authhandler *handler.AuthHandler
 }
 
 func NewServer() *Server {
@@ -52,7 +53,11 @@ func NewServer() *Server {
 	userService := services.NewUserService(repository)
 	userHandler := handler.NewUserHandler(userService)
 
+	authService := services.NewAuthService(repository)
+	authHandler := handler.NewAuthHandler(authService)
+
 	server.userHandler = userHandler
+	server.authhandler = authHandler
 	server.routes()
 	server.server.Handler = server.router
 	return &server

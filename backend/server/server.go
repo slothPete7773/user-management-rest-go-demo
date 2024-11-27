@@ -53,7 +53,8 @@ func NewServer() *Server {
 	userService := services.NewUserService(repository)
 	userHandler := handler.NewUserHandler(userService)
 
-	authService := services.NewAuthService(repository)
+	// TODO: Refactor ASAP
+	authService := services.NewAuthService(repository, repository)
 	authHandler := handler.NewAuthHandler(authService)
 
 	server.userHandler = userHandler

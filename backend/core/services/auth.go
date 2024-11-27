@@ -15,16 +15,18 @@ var userService = UserService{}
 
 type AuthService struct {
 	repo ports.AuthRepository
+	user ports.UserRepository
 }
 
-func NewAuthService(repo ports.AuthRepository) ports.AuthService {
-	return AuthService{repo}
+func NewAuthService(repo ports.AuthRepository, user ports.UserRepository) ports.AuthService {
+	return AuthService{repo, user}
 }
 
 func (svc AuthService) Login(input *domain.AuthCredential) (*domain.AuthResponse, error) {
 
 	// ISSUE!
-	user, err := userService.FindUserById(input.Name)
+	user, err := svc.user.GetUserById(input.Name)
+	// .FindUserById(input.Name)
 
 	if err != nil {
 		log.Println("error-login-find-user", err)

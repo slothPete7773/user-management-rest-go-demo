@@ -30,6 +30,7 @@ func (s *Server) routes() {
 		mustAuthRouter.Handle("/new-user", s.userHandler.NewUser()).Methods("POST")
 		mustAuthRouter.Handle("/update-user", s.userHandler.UpdateUser()).Methods("PUT")
 		mustAuthRouter.Handle("/delete-user", s.userHandler.DeleteUserById()).Methods("PUT")
+		mustAuthRouter.Handle("/login", s.authhandler.Login()).Methods("POST")
 	}
 
 }

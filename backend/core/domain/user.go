@@ -1,10 +1,13 @@
 package domain
 
+import "github.com/google/uuid"
+
 type User struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
-	FavoriteNumber int    `json:"favorite_number"`
-	HomeworldRealm string `json:"homeworld_realm"`
+	ID             uuid.UUID `json:"id"`
+	Password       string    `json:"password"`
+	Name           string    `json:"name"`
+	FavoriteNumber int       `json:"favorite_number"`
+	HomeworldRealm string    `json:"homeworld_realm"`
 }
 
 type UserInput struct {

@@ -7,7 +7,7 @@ import (
 )
 
 type UserService struct {
-	repo ports.UserRepository
+	user ports.UserRepository
 }
 
 func NewUserService(repo ports.UserRepository) ports.UserService {
@@ -15,7 +15,7 @@ func NewUserService(repo ports.UserRepository) ports.UserService {
 }
 
 func (svc UserService) NewUser(input domain.UserInput) (*domain.User, error) {
-	user, err := svc.repo.CreateUser(domain.UserData{
+	user, err := svc.user.CreateUser(domain.UserData{
 		Name:           input.Name,
 		FavoriteNumber: input.FavoriteNumber,
 		HomeworldRealm: input.HomeworldRealm,
@@ -28,7 +28,7 @@ func (svc UserService) NewUser(input domain.UserInput) (*domain.User, error) {
 	return user, nil
 }
 func (svc UserService) UpdateUser(id string, input domain.UserInput) (*domain.User, error) {
-	user, err := svc.repo.UpdateUser(id, domain.UserData{
+	user, err := svc.user.UpdateUser(id, domain.UserData{
 		Name:           "slothPete",
 		FavoriteNumber: 42,
 		HomeworldRealm: "bakk",
@@ -41,7 +41,7 @@ func (svc UserService) UpdateUser(id string, input domain.UserInput) (*domain.Us
 	return user, nil
 }
 func (svc UserService) DeleteUserById(id string) error {
-	err := svc.DeleteUserById(id)
+	err := svc.user.DeleteUserById(id)
 	if err != nil {
 		fmt.Println("service-delete-user-error", err.Error())
 		return err
@@ -50,7 +50,7 @@ func (svc UserService) DeleteUserById(id string) error {
 }
 func (svc UserService) FindUserById(id string) (*domain.User, error) {
 
-	user, err := svc.repo.GetUserById(id)
+	user, err := svc.user.GetUserById(id)
 	if err != nil {
 		fmt.Println("service-get-user-by-id-error", err.Error())
 		return nil, err
@@ -58,7 +58,7 @@ func (svc UserService) FindUserById(id string) (*domain.User, error) {
 	return user, nil
 }
 func (svc UserService) FindMany() ([]*domain.User, error) {
-	users, err := svc.repo.GetUserMany()
+	users, err := svc.user.GetUserMany()
 	if err != nil {
 		fmt.Println("service-update-user-error", err.Error())
 		return nil, err

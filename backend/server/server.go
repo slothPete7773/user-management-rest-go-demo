@@ -6,7 +6,6 @@ import (
 	"backend/core/domain"
 	"backend/core/services"
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -22,6 +21,7 @@ type Server struct {
 	server      *http.Server
 	router      *mux.Router
 	userHandler *handler.UserHandler
+	authhandler *handler.AuthHandler
 }
 
 func NewServer() *Server {
@@ -45,14 +45,18 @@ func NewServer() *Server {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
-	fmt.Println("Ping completed.")
+	log.Println("Ping completed.")
 
 	repository := repository.NewRepository(db)
 
 	userService := services.NewUserService(repository)
 	userHandler := handler.NewUserHandler(userService)
 
+	authService := services.NewAuthService(repository, repository)
+	authHandler := handler.NewAuthHandler(authService)
+
 	server.userHandler = userHandler
+	server.authhandler = authHandler
 	server.routes()
 	server.server.Handler = server.router
 	return &server
